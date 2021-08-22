@@ -3,9 +3,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"io/ioutil"
 )
 
 	//lire un fichier ici DID
@@ -16,16 +13,12 @@ import (
 func main(){
 	fmt.Println("Début lecture fichier")
 
-	file, err := os.OpenFile("/Users/plouiserre/Projects/ProcessDeputesData/Data/1 - DeputesActifsMandatsActifsOrganes_XV/acteur/PA2960.json",  os.O_RDONLY,0666)
-	if err != nil{
-		log.Fatal(err)
+	fileManager := fileManager {
+		nameFile : "/Users/plouiserre/Projects/ProcessDeputesData/Data/1 - DeputesActifsMandatsActifsOrganes_XV/acteur/PA2960.json",
 	}
-	content, err := ioutil.ReadAll(file)
-	if err != nil{
-		log.Fatal(err)
-	}
-	displayContnet := string(content)
+	fileManager.getContentFile()
+
 	fmt.Println("Contenu du fichier")
-	fmt.Print(displayContnet)
+	fmt.Println(fileManager.contentFile)
 	fmt.Println("Fin lecture fichier")
 }
