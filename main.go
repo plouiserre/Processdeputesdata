@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-	//lire un fichier ici DID
-	//le mettre dans un fichier à part
-	//récupérer le contenu à afficher ensuite de l'objet
-	//afficher le contenu
-
 func main(){
 	fmt.Println("Début lecture fichier")
 
@@ -18,7 +13,12 @@ func main(){
 	}
 	fileManager.getContentFile()
 
-	fmt.Println("Contenu du fichier")
+	/*fmt.Println("Contenu du fichier")
 	fmt.Println(fileManager.contentFile)
-	fmt.Println("Fin lecture fichier")
+	fmt.Println("Fin lecture fichier")*/
+	fmt.Println("Début Désérialisation")
+	dataManager := dataManager {
+	}
+	dataManager.getDeputyData(fileManager.contentFile)
+	fmt.Println("Fin désérialisation")
 }
