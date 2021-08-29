@@ -19,6 +19,6 @@ func main(){
 	fmt.Println("Début Désérialisation")
 	dataManager := dataManager {
 	}
-	dataManager.getDeputyData(fileManager.contentFile)
+	dataManager.ProcessDeputyData(fileManager.contentFile)
 	fmt.Println("Fin désérialisation")
 }

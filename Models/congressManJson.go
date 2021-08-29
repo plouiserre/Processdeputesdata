@@ -1,29 +1,29 @@
-package modelsJson
+package Models
 
 //all struct get in 1 - DeputesActifsMandatsActifsOrganes_XV
 
-type CongressMan struct{
-	Actor Actor `json:"Acteur"`
+type CongressManJson struct{
+	Actor ActorJson `json:"Acteur"`
 }
 
-type Actor struct{
-	Uid Uid
-	CivilState CivilState `json:"etatCivil"`
-	Job Profession `json:"Profession"`
-	Addresses Addresses `json:"Adresses"`
-	Mandates Mandates `json:"Mandats"` 
+type ActorJson struct{
+	Uid UidJson
+	CivilState CivilStateJson `json:"etatCivil"`
+	Job ProfessionJson `json:"Profession"`
+	Addresses AddressesJson `json:"Adresses"`
+	Mandates MandatesJson `json:"Mandats"` 
 } 
 
-type Uid struct{
+type UidJson struct{
 	Id string `json:"#text"`
 }
 
-type CivilState struct{
-	Identity Identity `json:"ident"`
-	BirthNews BirthNews	 `json:"infoNaissance"`
+type CivilStateJson struct{
+	Identity IdentityJson `json:"ident"`
+	BirthNews BirthNewsJson	 `json:"infoNaissance"`
 }
 
-type Identity struct{
+type IdentityJson struct{
 	Civility string `json:"civ"`
 	FirstName string `json:"prenom"`
 	LastName string `json:"nom"`
@@ -31,24 +31,24 @@ type Identity struct{
 	Trigramme string
 }
 
-type BirthNews struct{
+type BirthNewsJson struct{
 	BirthDate string `json:"dateNais"`
 	BirthCity string `json:"villeNais"`
 	BirthDepartment string `json:"depNais"`
 	BirthCountry string `json:"paysNais"`
 }
 
-type Profession struct{
+type ProfessionJson struct{
 	JobTitle string `json:"libelleCourant"`
-	SocProcINSEE JobInseeData
+	SocProcINSEE JobInseeDataJson
 }
 
-type JobInseeData struct{
+type JobInseeDataJson struct{
 	CatSocPro string
 	FamSocPro string
 }
 
-type Addresses struct{
+type AddressesJson struct{
 	Address []Address `json:"Adresse"`
 }
 
@@ -68,11 +68,11 @@ type Address struct{
 	valElect string
 }
 
-type Mandates struct{
-	Mandate []Mandate `json:"Mandat"`
+type MandatesJson struct{
+	Mandate []MandateJson `json:"Mandat"`
 }
 
-type Mandate struct{
+type MandateJson struct{
 	Uid string 
 	ActeurId string `json:"ActeurRef"`
 	TermOffice int `json:"Legislature,string"`
@@ -82,39 +82,39 @@ type Mandate struct{
 	EndDate string `json:"dateFin"`
 	Precedence int `json:"preseance,string"`
 	PrincipleNomin int `json:"nominPrincipale,string"`
-	DataQuality DataQuality `json:"infosQualite"`
-	Body Body `json:"organe"`
-	Deputies Deputies `json:"suppleants"`
-	Election Election
+	DataQuality DataQualityJson `json:"infosQualite"`
+	Body BodyJson `json:"organe"`
+	Deputies DeputiesJson `json:"suppleants"`
+	Election ElectionJson
 }
 
-type DataQuality struct{
+type DataQualityJson struct{
 	QualityCode string `json:"codeQualite"`
-	QualiteLabel string `json:"libQualite"`
-	QualiteLabelSex string `json:"libQualiteSex"`
+	QualityLabel string `json:"libQualite"`
+	QualityLabelSex string `json:"libQualiteSex"`
 }
 
-type Body struct{
+type BodyJson struct{
 	RefBody string `json:"organeRef"`
 }
 
-type Deputies struct{
-	Deputy Deputy `json:"suppleant"`
+type DeputiesJson struct{
+	Deputy DeputyJson `json:"suppleant"`
 }
 
-type Deputy struct{
+type DeputyJson struct{
 	StartDate string `json:"dateDebut"`
 	EndDate string `json:"dateFin"`
 	RefDeputy string `json:"suppleantRef"`
 }
 
-type Election struct{
+type ElectionJson struct{
 	MandateCause string `json:"causeMandat"`
 	DistrictRef string `json:"refCirconscription"`
-	Place Place `json:"lieu"`
+	Place PlaceJson `json:"lieu"`
 }
 
-type Place struct{
+type PlaceJson struct{
 	Region string
 	TypeRegion string `json:"regionType"`
 	Department string `json:"departement"`
