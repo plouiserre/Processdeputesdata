@@ -1,24 +1,22 @@
 package main
 
 
-import (
-	"fmt"
-)
-
 func main(){
-	fmt.Println("Début lecture fichier")
+	logManager := LogManager{}
+	logManager.InitLog()
+
+	logManager.WriteInfoLog("Début lecture fichier")
 
 	fileManager := fileManager {
 		nameFile : "/Users/plouiserre/Projects/ProcessDeputesData/Data/1 - DeputesActifsMandatsActifsOrganes_XV/acteur/PA2960.json",
+		LogManager : logManager,
 	}
 	fileManager.getContentFile()
 
-	/*fmt.Println("Contenu du fichier")
-	fmt.Println(fileManager.contentFile)
-	fmt.Println("Fin lecture fichier")*/
-	fmt.Println("Début Désérialisation")
+	logManager.WriteInfoLog("Début Désérialisation")
 	dataManager := dataManager {
+		LogManager : logManager,
 	}
 	dataManager.ProcessDeputyData(fileManager.contentFile)
-	fmt.Println("Fin désérialisation")
+	logManager.WriteInfoLog("Fin désérialisation")
 }
