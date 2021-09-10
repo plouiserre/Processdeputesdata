@@ -20,14 +20,20 @@ func main() {
 	logManager.WriteInfoLog("Fin désérialisation")
 
 	logManager.WriteInfoLog("Début enregistrement")
-	sqlManager := SqlManager{
+	/*sqlManager := SqlManager{
 		Log: logManager,
 	}
-	repository := congressManRepository{
+	repository := CongressManRepository{
 		Log:  logManager,
 		Sql:  sqlManager,
 		Data: dataManager,
 	}
-	repository.RecordAllCongressManData()
+	repository.RecordAllCongressManData()*/
+
+	repositoryManager := RepositoryManager{
+		Log:  logManager,
+		Data: dataManager,
+	}
+	repositoryManager.StoreAllDatas()
 	logManager.WriteInfoLog("Fin enregistrement")
 }

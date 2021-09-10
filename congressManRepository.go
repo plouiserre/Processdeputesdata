@@ -1,16 +1,16 @@
 package main
 
-type congressManRepository struct {
+type CongressManRepository struct {
 	Sql  SqlManager
 	Log  LogManager
 	Data DataManager
 }
 
-func (repository *congressManRepository) RecordAllCongressManData() {
+func (repository *CongressManRepository) RecordAllCongressManData() {
 	repository.RecordCongressManData()
 }
 
-func (repository *congressManRepository) RecordCongressManData() {
+func (repository *CongressManRepository) RecordCongressManData() {
 	congressMan := repository.Data.CongressManModel
 	queryCongressMan := "INSERT INTO PROCESSDEPUTES.Congressman(CongressManUid, Civility, FirstName, LastName, Alpha, Trigramme, BirthDate, BirthCity, BirthDepartment, BirthCountry, JobTitle, CatSocPro, FamSocPro) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
