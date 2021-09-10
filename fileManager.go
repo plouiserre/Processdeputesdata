@@ -1,23 +1,23 @@
 package main
 
-import(
-	"os"
+import (
 	"io/ioutil"
+	"os"
 )
 
-type fileManager struct{
-	nameFile string
+type fileManager struct {
+	nameFile    string
 	contentFile string
-	LogManager LogManager
+	LogManager  LogManager
 }
 
-func (fileManager *fileManager) getContentFile(){
-	file, err := os.OpenFile(fileManager.nameFile,  os.O_RDONLY,0666)
-	if err != nil{
+func (fileManager *fileManager) getContentFile() {
+	file, err := os.OpenFile(fileManager.nameFile, os.O_RDONLY, 0666)
+	if err != nil {
 		fileManager.LogManager.WriteErrorLog(err.Error())
 	}
 	content, err := ioutil.ReadAll(file)
-	if err != nil{
+	if err != nil {
 		fileManager.LogManager.WriteErrorLog(err.Error())
 	}
 	displayContnet := string(content)

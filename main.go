@@ -23,11 +23,11 @@ func main() {
 	sqlManager := SqlManager{
 		Log: logManager,
 	}
-	recordData := RecordData{
+	repository := congressManRepository{
 		Log:  logManager,
 		Sql:  sqlManager,
 		Data: dataManager,
 	}
-	recordData.RecordAllCongressManData()
+	repository.RecordAllCongressManData()
 	logManager.WriteInfoLog("Fin enregistrement")
 }

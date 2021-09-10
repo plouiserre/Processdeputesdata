@@ -1,4 +1,4 @@
-package Models
+package main
 
 type CongressManModel struct {
 	CongressManUid  string
