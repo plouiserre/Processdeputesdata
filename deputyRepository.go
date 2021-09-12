@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type DeputyRepository struct {
 	Sql  SqlManager
@@ -45,21 +48,16 @@ func (repository *DeputyRepository) InsertRepositoryWithEndDate(deputy Deputy) {
 
 	if errConvertStart != nil {
 		repository.Log.WriteErrorLog("Erreur de convertion  de startDate " + deputy.StartDate + " du deputy " + deputy.RefDeputy)
-		repository.Log.WriteErrorLog("Erreur message " + errConvertStart.Error())
-		repository.Log.WriteErrorLog("StartDate " + startDate.String())
 	} else if errConvertEnd != nil {
 		repository.Log.WriteErrorLog("Erreur de convertion  de endDate " + deputy.EndDate + " du deputy " + deputy.RefDeputy)
 	} else {
-		db := repository.Sql.InitDB()
+		stmt, db, err := repository.PrepareQuery(queryDeputy)
 
-		stmt, err := db.Prepare(queryDeputy)
-		if err != nil {
-			repository.Log.WriteErrorLog("Erreur préparation requête " + err.Error())
-		}
-
-		_, errExec := stmt.Exec(startDate, endDate, deputy.RefDeputy)
-		if errExec != nil {
-			repository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
+		if err == nil {
+			_, errExec := stmt.Exec(startDate, endDate, deputy.RefDeputy)
+			if errExec != nil {
+				repository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
+			}
 		}
 
 		defer db.Close()
@@ -75,21 +73,27 @@ func (repository *DeputyRepository) InsertRepositoryWithNoEndDate(deputy Deputy)
 
 	if errConvertStart != nil {
 		repository.Log.WriteErrorLog("Erreur de convertion  de startDate " + deputy.StartDate + " du deputy " + deputy.RefDeputy)
-		repository.Log.WriteErrorLog("Erreur message " + errConvertStart.Error())
-		repository.Log.WriteErrorLog("StartDate " + startDate.String())
 	} else {
-		db := repository.Sql.InitDB()
+		stmt, db, err := repository.PrepareQuery(queryDeputy)
 
-		stmt, err := db.Prepare(queryDeputy)
-		if err != nil {
-			repository.Log.WriteErrorLog("Erreur préparation requête " + err.Error())
-		}
-
-		_, errExec := stmt.Exec(startDate, deputy.RefDeputy)
-		if errExec != nil {
-			repository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
+		if err == nil {
+			_, errExec := stmt.Exec(startDate, deputy.RefDeputy)
+			if errExec != nil {
+				repository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
+			}
 		}
 
 		defer db.Close()
 	}
+}
+
+func (repository *DeputyRepository) PrepareQuery(query string) (*sql.Stmt, *sql.DB, error) {
+	db := repository.Sql.InitDB()
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		repository.Log.WriteErrorLog("Erreur préparation requête " + err.Error())
+	}
+
+	return stmt, db, err
 }
