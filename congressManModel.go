@@ -70,7 +70,9 @@ func (mandate *Mandate) GetMandate(mandateJson MandateJson) {
 	mandate.QualityLabel = mandateJson.DataQuality.QualityLabel
 	mandate.QualityLabelSex = mandateJson.DataQuality.QualityLabelSex
 	mandate.Deputy = Deputy{}
-	mandate.Deputy.GetDeputy(mandateJson.Deputies)
+	if mandateJson.Deputies != (DeputiesJson{}) {
+		mandate.Deputy.GetDeputy(mandateJson.Deputies)
+	}
 	mandate.Election.GetElection(mandateJson.Election)
 }
 
@@ -82,7 +84,7 @@ type Deputy struct {
 
 func (deputy *Deputy) GetDeputy(deputiesJson DeputiesJson) {
 	deputy.RefDeputy = deputiesJson.Deputy.RefDeputy
-	deputy.StartDate = deputiesJson.Deputy.StartDate
+	deputy.StartDate = deputiesJson.Deputy.StartDate + "T00:00:00Z"
 	deputy.EndDate = deputiesJson.Deputy.EndDate
 }
 

@@ -3,17 +3,30 @@ package main
 type RepositoryManager struct {
 	Log  LogManager
 	Data DataManager
+	Sql  SqlManager
 }
 
 func (repositoryManager *RepositoryManager) StoreAllDatas() {
-	sqlManager := SqlManager{
-		Log: repositoryManager.Log,
-	}
-	repository := CongressManRepository{
+	repositoryManager.StoreCongressManDatas()
+	repositoryManager.StoreDeputyDatas()
+}
+
+func (repositoryManager *RepositoryManager) StoreCongressManDatas() {
+	congressManRepository := CongressManRepository{
 		Log:  repositoryManager.Log,
-		Sql:  sqlManager,
+		Sql:  repositoryManager.Sql,
 		Data: repositoryManager.Data,
 	}
 
-	repository.RecordAllCongressManData()
+	congressManRepository.RecordAllCongressManData()
+}
+
+func (repositoryManager *RepositoryManager) StoreDeputyDatas() {
+	deputyRepository := DeputyRepository{
+		Log:  repositoryManager.Log,
+		Sql:  repositoryManager.Sql,
+		Data: repositoryManager.Data,
+	}
+
+	deputyRepository.RecordAllDeputyData()
 }
