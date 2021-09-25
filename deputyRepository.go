@@ -6,43 +6,43 @@ import (
 )
 
 type DeputyRepository struct {
-	Sql  SqlManager
-	Log  LogManager
-	Data DataManager
-}
-
-func (repository *DeputyRepository) RecordAllDeputyData() {
-	repository.RecordDeputyData()
+	Sql       SqlManager
+	Log       LogManager
+	Data      DataManager
+	MandateId int64
 }
 
 //TODO à optimiser plus tard
-func (repository *DeputyRepository) RecordDeputyData() {
+func (repository *DeputyRepository) RecordDeputyDatas(mandateId int64, mandateUid string) {
+	repository.MandateId = mandateId
 	mandates := repository.Data.CongressManModel.Mandates
 
 	for _, mandate := range mandates {
-		deputy := mandate.Deputy
-		if deputy != (Deputy{}) {
-			repository.InsertRepository(deputy)
+		if mandate.MandateUid == mandateUid {
+			deputy := mandate.Deputy
+			if deputy != (Deputy{}) {
+				repository.InsertDeputy(deputy)
+			}
 		}
 	}
 }
 
-//TODO normalement il faudrait que je mette un lien entre mandate et deputy mais pas pour le moment regarder notes du 11/09/21
-func (repository *DeputyRepository) InsertRepository(deputy Deputy) {
+func (repository *DeputyRepository) InsertDeputy(deputy Deputy) {
 	if len(deputy.EndDate) > 0 {
-		repository.InsertRepositoryWithEndDate(deputy)
+		repository.InsertDeputyWithEndDate(deputy)
 	} else {
-		repository.InsertRepositoryWithNoEndDate(deputy)
+		repository.InsertDeputyWithNoEndDate(deputy)
 	}
 }
 
-func (repository *DeputyRepository) InsertRepositoryWithEndDate(deputy Deputy) {
+func (repository *DeputyRepository) InsertDeputyWithEndDate(deputy Deputy) {
 	var startDate time.Time
 	var errConvertStart error
 	var endDate time.Time
 	var errConvertEnd error
-	queryDeputy := "INSERT INTO Deputy(StartDate, EndDate, RefDeputy) VALUES (?,?,?)"
+	queryDeputy := "INSERT INTO Deputy(StartDate, EndDate, RefDeputy, MandateId) VALUES (?,?,?,?)"
 
+	//TODO mettre dans une méthode la partie externalsiation
 	startDate, errConvertStart = time.Parse(time.RFC3339, deputy.StartDate)
 	endDate, errConvertEnd = time.Parse(time.RFC3339, deputy.EndDate)
 
@@ -54,7 +54,7 @@ func (repository *DeputyRepository) InsertRepositoryWithEndDate(deputy Deputy) {
 		stmt, db, err := repository.PrepareQuery(queryDeputy)
 
 		if err == nil {
-			_, errExec := stmt.Exec(startDate, endDate, deputy.RefDeputy)
+			_, errExec := stmt.Exec(startDate, endDate, deputy.RefDeputy, repository.MandateId)
 			if errExec != nil {
 				repository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
 			}
@@ -64,10 +64,10 @@ func (repository *DeputyRepository) InsertRepositoryWithEndDate(deputy Deputy) {
 	}
 }
 
-func (repository *DeputyRepository) InsertRepositoryWithNoEndDate(deputy Deputy) {
+func (repository *DeputyRepository) InsertDeputyWithNoEndDate(deputy Deputy) {
 	var startDate time.Time
 	var errConvertStart error
-	queryDeputy := "INSERT INTO Deputy(StartDate, RefDeputy) VALUES (?,?)"
+	queryDeputy := "INSERT INTO Deputy(StartDate, RefDeputy, MandateId) VALUES (?,?,?)"
 
 	startDate, errConvertStart = time.Parse(time.RFC3339, deputy.StartDate)
 
@@ -77,7 +77,7 @@ func (repository *DeputyRepository) InsertRepositoryWithNoEndDate(deputy Deputy)
 		stmt, db, err := repository.PrepareQuery(queryDeputy)
 
 		if err == nil {
-			_, errExec := stmt.Exec(startDate, deputy.RefDeputy)
+			_, errExec := stmt.Exec(startDate, deputy.RefDeputy, repository.MandateId)
 			if errExec != nil {
 				repository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
 			}

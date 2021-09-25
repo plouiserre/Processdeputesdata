@@ -24,10 +24,17 @@ func (repositoryManager *RepositoryManager) StoreCongressManDatas() {
 }
 
 func (repositoryManager *RepositoryManager) StoreMandateDatas() {
-	mandateRepository := MandateRepository{
+	//TODO à optimiser
+	deputyRepository := DeputyRepository{
 		Log:  repositoryManager.Log,
 		Sql:  repositoryManager.Sql,
 		Data: repositoryManager.Data,
+	}
+	mandateRepository := MandateRepository{
+		Log:              repositoryManager.Log,
+		Sql:              repositoryManager.Sql,
+		Data:             repositoryManager.Data,
+		DeputyRepository: deputyRepository,
 	}
 
 	mandateRepository.RecordAllMandates(repositoryManager.CongressManId)
