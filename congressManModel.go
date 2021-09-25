@@ -1,5 +1,7 @@
 package main
 
+//TODO mettre Model à tous les models
+
 type CongressManModel struct {
 	CongressManUid  string
 	Civility        string

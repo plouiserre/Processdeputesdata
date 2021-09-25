@@ -14,26 +14,8 @@ GRANT SELECT ON PROCESSDEPUTES.* TO 'ProcessDeputesData'@'localhost' ;
 USE PROCESSDEPUTES;
 
 -- créer les tables
--- 1 Election
-CREATE TABLE IF NOT EXISTS  Election(
-    ElectionId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    MandateCause VARCHAR(50) NOT NULL,
-    Region VARCHAR (50) NOT NULL,
-    TypeRegion VARCHAR (50) NOT NULL,
-    Department VARCHAR (50) NOT NULL,
-    DepartmentNum INT NOT NULL,
-    DistrictNum INT NOT NULL
-);
 
--- 2 Deputy
-CREATE TABLE IF NOT EXISTS  Deputy(
-    DeputyId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    StartDate DATETIME NOT NULL,
-    EndDate DATETIME,
-    RefDeputy VARCHAR (50) NOT NULL UNIQUE
-);
-
--- 3 Congressman
+-- 1 Congressman
 CREATE TABLE IF NOT EXISTS  Congressman(
     CongressManId INT PRIMARY KEY NOT NULL  AUTO_INCREMENT,
     CongressManUid VARCHAR(50) NOT NULL UNIQUE,
@@ -51,7 +33,7 @@ CREATE TABLE IF NOT EXISTS  Congressman(
     FamSocPro VARCHAR (50) NOT NULL
 );
 
--- 4 Mandate
+-- 2 Mandate
 CREATE TABLE IF NOT EXISTS  Mandate(
     MandateId INT PRIMARY KEY NOT NULL  AUTO_INCREMENT,
     MandateUid VARCHAR(50) NOT NULL UNIQUE,
@@ -65,10 +47,29 @@ CREATE TABLE IF NOT EXISTS  Mandate(
     QualityLabel VARCHAR(50),
     QualityLabelSex VARCHAR(50),
     RefBody VARCHAR(50) NOT NULL,
-    DeputyId INT,
-    ElectionId INT,
     CongressManId INT NOT NULL,
-    FOREIGN KEY (DeputyId) REFERENCES Deputy(DeputyId),
-    FOREIGN KEY (ElectionId) REFERENCES Election(ElectionId),
     FOREIGN KEY (CongressManId) REFERENCES CongressMan(CongressManId)
+);
+
+-- 3 Election
+CREATE TABLE IF NOT EXISTS  Election(
+    ElectionId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    MandateCause VARCHAR(50) NOT NULL,
+    Region VARCHAR (50) NOT NULL,
+    TypeRegion VARCHAR (50) NOT NULL,
+    Department VARCHAR (50) NOT NULL,
+    DepartmentNum INT NOT NULL,
+    DistrictNum INT NOT NULL,
+    MandateId INT,
+    FOREIGN KEY (MandateId) REFERENCES Mandate(MandateId)
+);
+
+-- 4 Deputy
+CREATE TABLE IF NOT EXISTS  Deputy(
+    DeputyId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME,
+    RefDeputy VARCHAR (50) NOT NULL UNIQUE,
+    MandateId INT,
+    FOREIGN KEY (MandateId) REFERENCES Mandate(MandateId)
 );
