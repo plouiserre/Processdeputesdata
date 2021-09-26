@@ -1,14 +1,15 @@
 package main
 
 type CongressManRepository struct {
-	Sql  SqlManager
-	Log  LogManager
-	Data DataManager
+	Sql               SqlManager
+	Log               LogManager
+	Data              DataManager
+	MandateRepository MandateRepository
 }
 
-func (repository *CongressManRepository) RecordAllCongressManData() int64 {
+func (repository *CongressManRepository) RecordAllCongressManData() {
 	congressManId := repository.RecordCongressManData()
-	return congressManId
+	repository.MandateRepository.RecordAllMandates(congressManId)
 }
 
 func (repository *CongressManRepository) RecordCongressManData() int64 {

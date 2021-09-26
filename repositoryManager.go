@@ -1,30 +1,16 @@
 package main
 
 type RepositoryManager struct {
-	Log           LogManager
-	Data          DataManager
-	Sql           SqlManager
-	CongressManId int64
+	Log  LogManager
+	Data DataManager
+	Sql  SqlManager
 }
 
 func (repositoryManager *RepositoryManager) StoreAllDatas() {
 	repositoryManager.StoreCongressManDatas()
-	repositoryManager.StoreMandateDatas()
-	//repositoryManager.StoreDeputyDatas()
 }
 
 func (repositoryManager *RepositoryManager) StoreCongressManDatas() {
-	congressManRepository := CongressManRepository{
-		Log:  repositoryManager.Log,
-		Sql:  repositoryManager.Sql,
-		Data: repositoryManager.Data,
-	}
-
-	repositoryManager.CongressManId = congressManRepository.RecordAllCongressManData()
-}
-
-func (repositoryManager *RepositoryManager) StoreMandateDatas() {
-	//TODO à optimiser
 	deputyRepository := DeputyRepository{
 		Log:  repositoryManager.Log,
 		Sql:  repositoryManager.Sql,
@@ -42,16 +28,12 @@ func (repositoryManager *RepositoryManager) StoreMandateDatas() {
 		DeputyRepository:   deputyRepository,
 		ElectionRepository: electionRepository,
 	}
-
-	mandateRepository.RecordAllMandates(repositoryManager.CongressManId)
-}
-
-/*func (repositoryManager *RepositoryManager) StoreDeputyDatas() {
-	deputyRepository := DeputyRepository{
-		Log:  repositoryManager.Log,
-		Sql:  repositoryManager.Sql,
-		Data: repositoryManager.Data,
+	congressManRepository := CongressManRepository{
+		Log:               repositoryManager.Log,
+		Sql:               repositoryManager.Sql,
+		Data:              repositoryManager.Data,
+		MandateRepository: mandateRepository,
 	}
 
-	deputyRepository.RecordAllDeputyData()
-}*/
+	congressManRepository.RecordAllCongressManData()
+}
