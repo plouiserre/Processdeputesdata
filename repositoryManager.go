@@ -30,11 +30,17 @@ func (repositoryManager *RepositoryManager) StoreMandateDatas() {
 		Sql:  repositoryManager.Sql,
 		Data: repositoryManager.Data,
 	}
+	electionRepository := ElectionRepository{
+		Log:  repositoryManager.Log,
+		Sql:  repositoryManager.Sql,
+		Data: repositoryManager.Data,
+	}
 	mandateRepository := MandateRepository{
-		Log:              repositoryManager.Log,
-		Sql:              repositoryManager.Sql,
-		Data:             repositoryManager.Data,
-		DeputyRepository: deputyRepository,
+		Log:                repositoryManager.Log,
+		Sql:                repositoryManager.Sql,
+		Data:               repositoryManager.Data,
+		DeputyRepository:   deputyRepository,
+		ElectionRepository: electionRepository,
 	}
 
 	mandateRepository.RecordAllMandates(repositoryManager.CongressManId)

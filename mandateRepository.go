@@ -3,11 +3,12 @@ package main
 import "database/sql"
 
 type MandateRepository struct {
-	Sql              SqlManager
-	Log              LogManager
-	Data             DataManager
-	DeputyRepository DeputyRepository
-	MandateId        int64
+	Sql                SqlManager
+	Log                LogManager
+	Data               DataManager
+	DeputyRepository   DeputyRepository
+	ElectionRepository ElectionRepository
+	MandateId          int64
 }
 
 func (mandateRepository *MandateRepository) RecordAllMandates(congressManId int64) {
@@ -18,7 +19,8 @@ func (mandateRepository *MandateRepository) RecordAllMandates(congressManId int6
 		} else {
 			mandateRepository.RecordMandateWithNoEndDate(mandateModel, congressManId)
 		}
-		mandateRepository.DeputyRepository.RecordDeputyDatas(mandateRepository.MandateId, mandateModel.MandateUid)
+		mandateRepository.DeputyRepository.RecordDeputyDatas(mandateRepository.MandateId, mandateModel.Deputy)
+		mandateRepository.ElectionRepository.RecordElection(mandateRepository.MandateId, mandateModel.Election)
 	}
 }
 
@@ -31,12 +33,12 @@ func (mandateRepository *MandateRepository) RecordMandateWithEndDate(mandateMode
 	if err == nil {
 		res, errExec := stmt.Exec(mandateModel.MandateUid, mandateModel.TermOffice, mandateModel.TypeOrgane, mandateModel.StartDate, mandateModel.EndDate, mandateModel.Precedence, mandateModel.PrincipleNomin, mandateModel.QualityCode, mandateModel.QualityLabel, mandateModel.QualityLabelSex, mandateModel.RefBody, congressManId)
 		if errExec != nil {
-			mandateRepository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
+			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
 		}
 		//TODO factoriser cette partie aussi
 		mandateId, errGetLastId := res.LastInsertId()
 		if errGetLastId != nil {
-			mandateRepository.Log.WriteErrorLog("Erreur récupérage Id" + errGetLastId.Error())
+			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur récupérage Id" + errGetLastId.Error())
 		}
 		mandateRepository.MandateId = mandateId
 	}
@@ -54,12 +56,12 @@ func (mandateRepository *MandateRepository) RecordMandateWithNoEndDate(mandateMo
 	if err == nil {
 		res, errExec := stmt.Exec(mandateModel.MandateUid, mandateModel.TermOffice, mandateModel.TypeOrgane, mandateModel.StartDate, mandateModel.Precedence, mandateModel.PrincipleNomin, mandateModel.QualityCode, mandateModel.QualityLabel, mandateModel.QualityLabelSex, mandateModel.RefBody, congressManId)
 		if errExec != nil {
-			mandateRepository.Log.WriteErrorLog("Erreur exécution requête " + errExec.Error())
+			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
 		}
 		//TODO factoriser cette partie aussi
 		mandateId, errGetLastId := res.LastInsertId()
 		if errGetLastId != nil {
-			mandateRepository.Log.WriteErrorLog("Erreur récupérage Id" + errGetLastId.Error())
+			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur récupérage Id" + errGetLastId.Error())
 		}
 		mandateRepository.MandateId = mandateId
 	}
@@ -73,7 +75,7 @@ func (mandateRepository *MandateRepository) PrepareQuery(query string) (*sql.Stm
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
-		mandateRepository.Log.WriteErrorLog("Erreur préparation requête " + err.Error())
+		mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur préparation requête " + err.Error())
 	}
 
 	return stmt, db, err
