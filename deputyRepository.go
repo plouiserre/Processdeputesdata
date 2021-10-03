@@ -1,26 +1,24 @@
 package main
 
 import (
-	"database/sql"
 	"time"
 )
 
 type DeputyRepository struct {
-	Sql       SqlManager
-	Log       LogManager
-	Data      DataManager
-	MandateId int64
+	RepositoryManager *RepositoryManager
+	MandateId         int64
+	utility           Utility
 }
 
-func (repository *DeputyRepository) RecordDeputyDatas(mandateId int64, deputy Deputy) {
+func (repository *DeputyRepository) RecordDeputyDatas(mandateId int64, deputy DeputyModel) {
 	repository.MandateId = mandateId
 
-	if deputy != (Deputy{}) {
+	if deputy != (DeputyModel{}) {
 		repository.InsertDeputy(deputy)
 	}
 }
 
-func (repository *DeputyRepository) InsertDeputy(deputy Deputy) {
+func (repository *DeputyRepository) InsertDeputy(deputy DeputyModel) {
 	if len(deputy.EndDate) > 0 {
 		repository.InsertDeputyWithEndDate(deputy)
 	} else {
@@ -28,65 +26,53 @@ func (repository *DeputyRepository) InsertDeputy(deputy Deputy) {
 	}
 }
 
-func (repository *DeputyRepository) InsertDeputyWithEndDate(deputy Deputy) {
+func (deputyRepository *DeputyRepository) InsertDeputyWithEndDate(deputy DeputyModel) {
 	var startDate time.Time
-	var errConvertStart error
 	var endDate time.Time
-	var errConvertEnd error
-	queryDeputy := "INSERT INTO Deputy(StartDate, EndDate, RefDeputy, MandateId) VALUES (?,?,?,?)"
-
-	//TODO mettre dans une méthode la partie externalsiation
-	startDate, errConvertStart = time.Parse(time.RFC3339, deputy.StartDate)
-	endDate, errConvertEnd = time.Parse(time.RFC3339, deputy.EndDate)
-
-	if errConvertStart != nil {
-		repository.Log.WriteErrorLog("Deputy Repository : Erreur de convertion  de startDate " + deputy.StartDate + " du deputy " + deputy.RefDeputy)
-	} else if errConvertEnd != nil {
-		repository.Log.WriteErrorLog("Deputy Repository : Erreur de convertion  de endDate " + deputy.EndDate + " du deputy " + deputy.RefDeputy)
-	} else {
-		stmt, db, err := repository.PrepareQuery(queryDeputy)
-
-		if err == nil {
-			_, errExec := stmt.Exec(startDate, endDate, deputy.RefDeputy, repository.MandateId)
-			if errExec != nil {
-				repository.Log.WriteErrorLog("Deputy Repository : Erreur exécution requête " + errExec.Error())
-			}
-		}
-
-		defer db.Close()
-	}
-}
-
-func (repository *DeputyRepository) InsertDeputyWithNoEndDate(deputy Deputy) {
-	var startDate time.Time
-	var errConvertStart error
-	queryDeputy := "INSERT INTO Deputy(StartDate, RefDeputy, MandateId) VALUES (?,?,?)"
-
-	startDate, errConvertStart = time.Parse(time.RFC3339, deputy.StartDate)
-
-	if errConvertStart != nil {
-		repository.Log.WriteErrorLog("Deputy Repository : Erreur de convertion  de startDate " + deputy.StartDate + " du deputy " + deputy.RefDeputy)
-	} else {
-		stmt, db, err := repository.PrepareQuery(queryDeputy)
-
-		if err == nil {
-			_, errExec := stmt.Exec(startDate, deputy.RefDeputy, repository.MandateId)
-			if errExec != nil {
-				repository.Log.WriteErrorLog("Deputy Repository : Erreur exécution requête " + errExec.Error())
-			}
-		}
-
-		defer db.Close()
-	}
-}
-
-func (repository *DeputyRepository) PrepareQuery(query string) (*sql.Stmt, *sql.DB, error) {
+	repository := deputyRepository.RepositoryManager
 	db := repository.Sql.InitDB()
+	nameRepository := "Deputy Repository : "
+	queryDeputy := "INSERT INTO Deputy(StartDate, EndDate, RefDeputy, MandateId) VALUES (?,?,?,?)"
+	errorMessageConvertStart := "Deputy Repository : Erreur de convertion  de startDate " + deputy.StartDate + " du deputy " + deputy.RefDeputy
+	errorMessageConvertEnd := "Deputy Repository : Erreur de convertion  de endDate " + deputy.EndDate + " du deputy " + deputy.RefDeputy
 
-	stmt, err := db.Prepare(query)
-	if err != nil {
-		repository.Log.WriteErrorLog("Deputy Repository : Erreur préparation requête " + err.Error())
+	startDate, resultConvertStart := deputyRepository.utility.ConvertStringToTime(deputy.StartDate, errorMessageConvertStart)
+	endDate, resultConvertEnd := deputyRepository.utility.ConvertStringToTime(deputy.EndDate, errorMessageConvertEnd)
+
+	if resultConvertStart && resultConvertEnd {
+		stmt, isOk := repository.Sql.PrepareRequest(db, queryDeputy, nameRepository)
+
+		if isOk {
+			_, errExec := stmt.Exec(startDate, endDate, deputy.RefDeputy, deputyRepository.MandateId)
+			if errExec != nil {
+				repository.Log.WriteErrorLog("Deputy Repository : Erreur exécution requête " + errExec.Error())
+			}
+		}
+
+		defer db.Close()
 	}
+}
 
-	return stmt, db, err
+func (deputyRepository *DeputyRepository) InsertDeputyWithNoEndDate(deputy DeputyModel) {
+	var startDate time.Time
+	repository := deputyRepository.RepositoryManager
+	db := repository.Sql.InitDB()
+	nameRepository := "Deputy Repository : "
+	queryDeputy := "INSERT INTO Deputy(StartDate, RefDeputy, MandateId) VALUES (?,?,?)"
+	errorMessageConvertStart := "Deputy Repository : Erreur de convertion  de startDate " + deputy.StartDate + " du deputy " + deputy.RefDeputy
+
+	startDate, resultConvertStart := deputyRepository.utility.ConvertStringToTime(deputy.StartDate, errorMessageConvertStart)
+
+	if resultConvertStart {
+		stmt, isOk := repository.Sql.PrepareRequest(db, queryDeputy, nameRepository)
+
+		if isOk {
+			_, errExec := stmt.Exec(startDate, deputy.RefDeputy, deputyRepository.MandateId)
+			if errExec != nil {
+				repository.Log.WriteErrorLog("Deputy Repository : Erreur exécution requête " + errExec.Error())
+			}
+		}
+
+		defer db.Close()
+	}
 }

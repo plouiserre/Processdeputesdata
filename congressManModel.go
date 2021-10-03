@@ -16,7 +16,7 @@ type CongressManModel struct {
 	JobTitle        string
 	CatSocPro       string
 	FamSocPro       string
-	Mandates        []Mandate
+	Mandates        []MandateModel
 }
 
 func (congressManModel *CongressManModel) GetCongressManModel(congressManJson CongressManJson) {
@@ -33,16 +33,15 @@ func (congressManModel *CongressManModel) GetCongressManModel(congressManJson Co
 	congressManModel.JobTitle = congressManJson.Actor.Job.JobTitle
 	congressManModel.CatSocPro = congressManJson.Actor.Job.SocProcINSEE.CatSocPro
 	congressManModel.FamSocPro = congressManJson.Actor.Job.SocProcINSEE.FamSocPro
-	congressManModel.Mandates = []Mandate{}
+	congressManModel.Mandates = []MandateModel{}
 	for _, mandate := range congressManJson.Actor.Mandates.Mandate {
-		mandateModel := Mandate{}
+		mandateModel := MandateModel{}
 		mandateModel.GetMandate(mandate)
 		congressManModel.Mandates = append(congressManModel.Mandates, mandateModel)
-		//congressManModel.Mandates[i].GetMandate(mandate)
 	}
 }
 
-type Mandate struct {
+type MandateModel struct {
 	MandateUid      string
 	TermOffice      int
 	TypeOrgane      string
@@ -55,11 +54,11 @@ type Mandate struct {
 	QualityLabel    string
 	QualityLabelSex string
 	RefBody         string
-	Deputy          Deputy
-	Election        Election
+	Deputy          DeputyModel
+	Election        ElectionModel
 }
 
-func (mandate *Mandate) GetMandate(mandateJson MandateJson) {
+func (mandate *MandateModel) GetMandate(mandateJson MandateJson) {
 	mandate.MandateUid = mandateJson.Uid
 	mandate.TermOffice = mandateJson.TermOffice
 	mandate.TypeOrgane = mandateJson.TypeOrgane
@@ -71,26 +70,26 @@ func (mandate *Mandate) GetMandate(mandateJson MandateJson) {
 	mandate.QualityCode = mandateJson.DataQuality.QualityCode
 	mandate.QualityLabel = mandateJson.DataQuality.QualityLabel
 	mandate.QualityLabelSex = mandateJson.DataQuality.QualityLabelSex
-	mandate.Deputy = Deputy{}
+	mandate.Deputy = DeputyModel{}
 	if mandateJson.Deputies != (DeputiesJson{}) {
 		mandate.Deputy.GetDeputy(mandateJson.Deputies)
 	}
 	mandate.Election.GetElection(mandateJson.Election)
 }
 
-type Deputy struct {
+type DeputyModel struct {
 	StartDate string `json:"dateDebut"`
 	EndDate   string `json:"dateFin"`
 	RefDeputy string `json:"suppleantRef"`
 }
 
-func (deputy *Deputy) GetDeputy(deputiesJson DeputiesJson) {
+func (deputy *DeputyModel) GetDeputy(deputiesJson DeputiesJson) {
 	deputy.RefDeputy = deputiesJson.Deputy.RefDeputy
 	deputy.StartDate = deputiesJson.Deputy.StartDate + "T00:00:00Z"
 	deputy.EndDate = deputiesJson.Deputy.EndDate
 }
 
-type Election struct {
+type ElectionModel struct {
 	MandateCause  string `json:"causeMandat"`
 	DistrictRef   string `json:"refCirconscription"`
 	Region        string
@@ -100,7 +99,7 @@ type Election struct {
 	DistrictNum   int    `json:"numCirco,string"`
 }
 
-func (election *Election) GetElection(electionJson ElectionJson) {
+func (election *ElectionModel) GetElection(electionJson ElectionJson) {
 	election.MandateCause = electionJson.MandateCause
 	election.DistrictRef = electionJson.DistrictRef
 	election.Region = electionJson.Place.Region

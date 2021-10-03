@@ -24,3 +24,22 @@ func (sqlManager *SqlManager) InitDB() (db *sql.DB) {
 
 	return db
 }
+
+func (sqlManager *SqlManager) GetLastIdInsert(res sql.Result, repositoryName string) int64 {
+	lid, errGetLastId := res.LastInsertId()
+	if errGetLastId != nil {
+		sqlManager.Log.WriteErrorLog(repositoryName + ": Erreur récupérage Id" + errGetLastId.Error())
+	}
+	return lid
+}
+
+//TODO renvoyer aussi un boolean pour continuer ou pas
+func (sqlManager *SqlManager) PrepareRequest(db *sql.DB, query string, repositoryName string) (*sql.Stmt, bool) {
+	isOk := true
+	stmt, err := db.Prepare((query))
+	if err != nil {
+		sqlManager.Log.WriteErrorLog(repositoryName + ": Erreur préparation requête " + err.Error())
+		isOk = false
+	}
+	return stmt, isOk
+}

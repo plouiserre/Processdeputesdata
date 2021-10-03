@@ -1,45 +1,46 @@
 package main
 
-import "database/sql"
+import (
+	_ "github.com/go-sql-driver/mysql"
+)
 
 type MandateRepository struct {
-	Sql                SqlManager
-	Log                LogManager
-	Data               DataManager
+	RepositoryManager  *RepositoryManager
 	DeputyRepository   DeputyRepository
 	ElectionRepository ElectionRepository
 	MandateId          int64
+	CongressManId      int64
 }
 
-func (mandateRepository *MandateRepository) RecordAllMandates(congressManId int64) {
-	model := mandateRepository.Data.CongressManModel
+func (mandateRepository *MandateRepository) RecordAllMandates() {
+	repository := mandateRepository.RepositoryManager
+	model := repository.Data.CongressManModel
 	for _, mandateModel := range model.Mandates {
 		if len(mandateModel.EndDate) > 0 {
-			mandateRepository.RecordMandateWithEndDate(mandateModel, congressManId)
+			mandateRepository.RecordMandateWithEndDate(mandateModel)
 		} else {
-			mandateRepository.RecordMandateWithNoEndDate(mandateModel, congressManId)
+			mandateRepository.RecordMandateWithNoEndDate(mandateModel)
 		}
 		mandateRepository.DeputyRepository.RecordDeputyDatas(mandateRepository.MandateId, mandateModel.Deputy)
 		mandateRepository.ElectionRepository.RecordElection(mandateRepository.MandateId, mandateModel.Election)
 	}
 }
 
-//TODO tout passer en paramètre de la structure après avoir fait la boucle
-func (mandateRepository *MandateRepository) RecordMandateWithEndDate(mandateModel Mandate, congressManId int64) {
-	queryCongressMan := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, TypeOrgane, StartDate, EndDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+func (mandateRepository *MandateRepository) RecordMandateWithEndDate(mandateModel MandateModel) {
+	queryMandate := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, TypeOrgane, StartDate, EndDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+	repository := mandateRepository.RepositoryManager
+	db := repository.Sql.InitDB()
+	nameRepository := "Mandate Repository"
 
-	stmt, db, err := mandateRepository.PrepareQuery(queryCongressMan)
+	stmt, isOk := repository.Sql.PrepareRequest(db, queryMandate, nameRepository)
 
-	if err == nil {
-		res, errExec := stmt.Exec(mandateModel.MandateUid, mandateModel.TermOffice, mandateModel.TypeOrgane, mandateModel.StartDate, mandateModel.EndDate, mandateModel.Precedence, mandateModel.PrincipleNomin, mandateModel.QualityCode, mandateModel.QualityLabel, mandateModel.QualityLabelSex, mandateModel.RefBody, congressManId)
+	if isOk {
+		res, errExec := stmt.Exec(mandateModel.MandateUid, mandateModel.TermOffice, mandateModel.TypeOrgane, mandateModel.StartDate, mandateModel.EndDate, mandateModel.Precedence, mandateModel.PrincipleNomin, mandateModel.QualityCode, mandateModel.QualityLabel, mandateModel.QualityLabelSex, mandateModel.RefBody, mandateRepository.CongressManId)
 		if errExec != nil {
-			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
+			repository.Log.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
 		}
-		//TODO factoriser cette partie aussi
-		mandateId, errGetLastId := res.LastInsertId()
-		if errGetLastId != nil {
-			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur récupérage Id" + errGetLastId.Error())
-		}
+		mandateId := repository.Sql.GetLastIdInsert(res, nameRepository)
+
 		mandateRepository.MandateId = mandateId
 	}
 
@@ -47,36 +48,23 @@ func (mandateRepository *MandateRepository) RecordMandateWithEndDate(mandateMode
 
 }
 
-func (mandateRepository *MandateRepository) RecordMandateWithNoEndDate(mandateModel Mandate, congressManId int64) {
+func (mandateRepository *MandateRepository) RecordMandateWithNoEndDate(mandateModel MandateModel) {
+	queryMandate := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, TypeOrgane, StartDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+	repository := mandateRepository.RepositoryManager
+	db := repository.Sql.InitDB()
+	nameRepository := "Mandate Repository"
 
-	queryCongressMan := "INSERT INTO PROCESSDEPUTES.Mandate(MandateUid, TermOffice, TypeOrgane, StartDate, Precedence, PrincipleNoming, QualityCode, QualityLabel, QualityLabelSex, RefBody, CongressManId) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+	stmt, isOk := repository.Sql.PrepareRequest(db, queryMandate, nameRepository)
 
-	stmt, db, err := mandateRepository.PrepareQuery(queryCongressMan)
-
-	if err == nil {
-		res, errExec := stmt.Exec(mandateModel.MandateUid, mandateModel.TermOffice, mandateModel.TypeOrgane, mandateModel.StartDate, mandateModel.Precedence, mandateModel.PrincipleNomin, mandateModel.QualityCode, mandateModel.QualityLabel, mandateModel.QualityLabelSex, mandateModel.RefBody, congressManId)
+	if isOk {
+		res, errExec := stmt.Exec(mandateModel.MandateUid, mandateModel.TermOffice, mandateModel.TypeOrgane, mandateModel.StartDate, mandateModel.Precedence, mandateModel.PrincipleNomin, mandateModel.QualityCode, mandateModel.QualityLabel, mandateModel.QualityLabelSex, mandateModel.RefBody, mandateRepository.CongressManId)
 		if errExec != nil {
-			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
+			repository.Log.WriteErrorLog("Mandate Repository : Erreur exécution requête " + errExec.Error())
 		}
-		//TODO factoriser cette partie aussi
-		mandateId, errGetLastId := res.LastInsertId()
-		if errGetLastId != nil {
-			mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur récupérage Id" + errGetLastId.Error())
-		}
+		mandateId := repository.Sql.GetLastIdInsert(res, nameRepository)
+
 		mandateRepository.MandateId = mandateId
 	}
 
 	defer db.Close()
-}
-
-//TODO la factoriser avec la deputyrepository
-func (mandateRepository *MandateRepository) PrepareQuery(query string) (*sql.Stmt, *sql.DB, error) {
-	db := mandateRepository.Sql.InitDB()
-
-	stmt, err := db.Prepare(query)
-	if err != nil {
-		mandateRepository.Log.WriteErrorLog("Mandate Repository : Erreur préparation requête " + err.Error())
-	}
-
-	return stmt, db, err
 }

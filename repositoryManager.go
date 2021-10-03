@@ -12,26 +12,18 @@ func (repositoryManager *RepositoryManager) StoreAllDatas() {
 
 func (repositoryManager *RepositoryManager) StoreCongressManDatas() {
 	deputyRepository := DeputyRepository{
-		Log:  repositoryManager.Log,
-		Sql:  repositoryManager.Sql,
-		Data: repositoryManager.Data,
+		RepositoryManager: repositoryManager,
 	}
 	electionRepository := ElectionRepository{
-		Log:  repositoryManager.Log,
-		Sql:  repositoryManager.Sql,
-		Data: repositoryManager.Data,
+		RepositoryManager: repositoryManager,
 	}
 	mandateRepository := MandateRepository{
-		Log:                repositoryManager.Log,
-		Sql:                repositoryManager.Sql,
-		Data:               repositoryManager.Data,
+		RepositoryManager:  repositoryManager,
 		DeputyRepository:   deputyRepository,
 		ElectionRepository: electionRepository,
 	}
 	congressManRepository := CongressManRepository{
-		Log:               repositoryManager.Log,
-		Sql:               repositoryManager.Sql,
-		Data:              repositoryManager.Data,
+		RepositoryManager: repositoryManager,
 		MandateRepository: mandateRepository,
 	}
 
