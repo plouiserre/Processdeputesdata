@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 )
 
 type DataManager struct {
@@ -21,6 +20,6 @@ func (dataManager *DataManager) getDeputyDataJson(congressManData string) {
 	data := []byte(congressManData)
 	err := json.Unmarshal(data, &dataManager.CongressManJson)
 	if err != nil {
-		log.Fatal(err)
+		dataManager.LogManager.WriteErrorLog(err.Error())
 	}
 }

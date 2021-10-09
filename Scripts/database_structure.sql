@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS  Congressman(
     BirthCity VARCHAR (50) NOT NULL,
     BirthDepartment VARCHAR (50) NOT NULL,
     BirthCountry VARCHAR (50) NOT NULL,
-    JobTitle VARCHAR (50) NOT NULL,
-    CatSocPro VARCHAR (50) NOT NULL,
+    JobTitle VARCHAR (255) NOT NULL,
+    CatSocPro VARCHAR (255) NOT NULL,
     FamSocPro VARCHAR (50) NOT NULL
 );
 
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS  Mandate(
     EndDate DATETIME,
     Precedence INT NOT NULL,
     PrincipleNoming INT NOT NULL,
-    QualityCode VARCHAR(50),
-    QualityLabel VARCHAR(50),
-    QualityLabelSex VARCHAR(50),
+    QualityCode VARCHAR(255),
+    QualityLabel VARCHAR(255),
+    QualityLabelSex VARCHAR(255),
     RefBody VARCHAR(50) NOT NULL,
     CongressManId INT NOT NULL,
     FOREIGN KEY (CongressManId) REFERENCES CongressMan(CongressManId)
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS  Mandate(
 -- 3 Election
 CREATE TABLE IF NOT EXISTS  Election(
     ElectionId INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    MandateCause VARCHAR(50) NOT NULL,
+    MandateCause VARCHAR(255) NOT NULL,
     Region VARCHAR (50) NOT NULL,
     TypeRegion VARCHAR (50) NOT NULL,
     Department VARCHAR (50) NOT NULL,

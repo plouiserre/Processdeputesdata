@@ -33,11 +33,11 @@ func (sqlManager *SqlManager) GetLastIdInsert(res sql.Result, repositoryName str
 	return lid
 }
 
-//TODO renvoyer aussi un boolean pour continuer ou pas
 func (sqlManager *SqlManager) PrepareRequest(db *sql.DB, query string, repositoryName string) (*sql.Stmt, bool) {
 	isOk := true
 	stmt, err := db.Prepare((query))
 	if err != nil {
+		sqlManager.Log.WriteErrorLog("Requête en erreur " + query)
 		sqlManager.Log.WriteErrorLog(repositoryName + ": Erreur préparation requête " + err.Error())
 		isOk = false
 	}
