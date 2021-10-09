@@ -11,6 +11,7 @@ func (repositoryManager *RepositoryManager) StoreAllDatas() {
 }
 
 func (repositoryManager *RepositoryManager) StoreCongressManDatas() {
+	repositoryManager.Sql.Log = repositoryManager.Log
 	deputyRepository := DeputyRepository{
 		RepositoryManager: repositoryManager,
 	}
