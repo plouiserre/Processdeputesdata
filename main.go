@@ -5,26 +5,10 @@ func main() {
 	logManager.InitLog()
 
 	logManager.WriteInfoLog("Début lecture fichier")
-
-	fileManager := fileManager{
-		nameFile:   "/Users/plouiserre/Projects/ProcessDeputesData/Data/1 - DeputesActifsMandatsActifsOrganes_XV/acteur/PA2960.json",
+	workflowManager := WorkflowManager{
 		LogManager: logManager,
+		FolderName: "/Users/plouiserre/Projects/ProcessDeputesData/Data/1 - DeputesActifsMandatsActifsOrganes_XV/acteur/",
 	}
-	fileManager.getContentFile()
 
-	logManager.WriteInfoLog("Début Désérialisation")
-	dataManager := DataManager{
-		LogManager: logManager,
-	}
-	dataManager.ProcessDeputyData(fileManager.contentFile)
-	logManager.WriteInfoLog("Fin désérialisation")
-
-	logManager.WriteInfoLog("Début enregistrement")
-
-	repositoryManager := RepositoryManager{
-		Log:  logManager,
-		Data: dataManager,
-	}
-	repositoryManager.StoreAllDatas()
-	logManager.WriteInfoLog("Fin enregistrement")
+	workflowManager.StoreAllDatas()
 }
