@@ -13,17 +13,13 @@ func (workflowManager *WorkflowManager) StoreAllDatas() {
 	for _, file := range files {
 		workflowManager.StoreDatasFile(file.Name())
 	}
-
-	//nameFile := workflowManager.FolderName + "PA721888.json"
-	//workflowManager.StoreDatasFile(nameFile)
 }
 
 func (workflowManager *WorkflowManager) StoreDatasFile(nameFile string) {
 	locationFileComplete := workflowManager.FolderName + nameFile
 	workflowManager.LogManager.WriteInfoLog("Début Traitement Fichier " + nameFile)
 	fileManager := fileManager{
-		nameFile: locationFileComplete,
-		//nameFile:   nameFile,
+		nameFile:   locationFileComplete,
 		LogManager: workflowManager.LogManager,
 	}
 	fileManager.getContentFile()

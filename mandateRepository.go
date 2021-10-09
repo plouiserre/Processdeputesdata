@@ -32,6 +32,7 @@ func (mandateRepository *MandateRepository) RecordMandateWithEndDate(mandateMode
 	db := repository.Sql.InitDB()
 	nameRepository := "Mandate Repository"
 
+	//C'est ici que ca pête donc la requête doit être pourri
 	stmt, isOk := repository.Sql.PrepareRequest(db, queryMandate, nameRepository)
 
 	if isOk {
